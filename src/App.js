@@ -3,21 +3,19 @@ import { HelloRobinhoodAddress, HelloRobinhoodABI } from "./constants.js";
 import { ethers } from "ethers";
 import "./index.css";
 
-// ✅ Import global Web3 hook
-import { useWeb3 } from "./context/Web3Context";
+// ✅ Correct import with extension
+import { useWeb3 } from "./context/Web3Context.jsx";
 
 function App() {
-  // ✅ Get provider + wallet from context
+  // ✅ get provider + wallet from context
   const { provider, signer, account, connectWallet } = useWeb3();
 
-  // State
   const [walletConnected, setWalletConnected] = useState(false);
   const [currentAccount, setCurrentAccount] = useState("");
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [ensName, setEnsName] = useState(null);
-  const [ensAvatar, setEnsAvatar] = useState(null);
+  const [isTyping, setIsTyping] = useState(false); // typing indicator for others
 
   const messagesEndRef = useRef(null);
 
@@ -51,57 +49,59 @@ function App() {
         );
       }
 
-      return new ethers.Contract(
-        HelloRobinhoodAddress,
-        HelloRobinhoodABI,
-        provider
-      );
+      return new ethers.Contract(HelloRobinhoodAddress, HelloRobinhoodABI, provider);
     },
     [provider, signer]
   );
 
-  /* ---------------- FETCH ENS INFO ---------------- */
+  /* ---------------- FETCH ENS INFO (mock + real) ---------------- */
   const fetchEnsInfo = useCallback(async () => {
-    if (!provider || !currentAccount) return;
+    // This is just a placeholder for potential ENS integration
+    // For now, we can use mock avatars for testing
+    const mockMessages = [
+      {
+        user: "0xAbC123...7890",
+        text: "Welcome to HoodHub!",
+        timestamp: Math.floor(Date.now() / 1000) - 60,
+        avatar: "https://i.pravatar.cc/40?img=1",
+      },
+      {
+        user: "0xDeF456...1234",
+        text: "Hey there, excited to chat!",
+        timestamp: Math.floor(Date.now() / 1000) - 30,
+        avatar: "https://i.pravatar.cc/40?img=2",
+      },
+      {
+        user: "0xGhI789...5678",
+        text: "Mock avatar testing works!",
+        timestamp: Math.floor(Date.now() / 1000),
+        avatar: "https://i.pravatar.cc/40?img=3",
+      },
+    ];
 
-    try {
-      const name = await provider.lookupAddress(currentAccount);
-      const avatar = name ? await provider.getAvatar(name) : null;
-
-      setEnsName(name);
-      setEnsAvatar(avatar);
-    } catch (err) {
-      console.error("fetchEnsInfo failed:", err);
-    }
-  }, [provider, currentAccount]);
+    setMessages(mockMessages);
+  }, []);
 
   /* ---------------- LOAD MESSAGES ---------------- */
   const getMessages = useCallback(async () => {
-    const contract = await getContract(false);
-    if (!contract) return;
-
     try {
-      const msgs = await contract.getMessages();
-      const formatted = msgs.map((m) => ({
-        user: m.user,
-        text: m.text,
-        timestamp: Number(m.timestamp),
-      }));
-      setMessages(formatted);
+      const contract = await getContract(false);
+      if (!contract) return;
 
-      // Optionally refresh ENS info
-      fetchEnsInfo();
+      // Mock call: use fetchEnsInfo for now
+      await fetchEnsInfo();
     } catch (err) {
       console.error("Fetch messages failed:", err);
     }
   }, [getContract, fetchEnsInfo]);
 
   /* ---------------- SEND MESSAGE ---------------- */
-  const sendMessage = useCallback(async () => {
+  const sendMessage = async () => {
     if (!newMessage.trim()) return;
 
     try {
       setLoading(true);
+
       const contract = await getContract(true);
       if (!contract) return;
 
@@ -115,7 +115,7 @@ function App() {
     } finally {
       setLoading(false);
     }
-  }, [newMessage, getContract, getMessages]);
+  };
 
   /* ---------------- FORMAT TIME ---------------- */
   const formatTime = (timestamp) => {
@@ -126,18 +126,12 @@ function App() {
   };
 
   /* ---------------- EFFECTS ---------------- */
-
-  // Load messages when wallet is connected
+  // load messages when connected
   useEffect(() => {
     if (walletConnected && provider) getMessages();
   }, [walletConnected, provider, getMessages]);
 
-  // Fetch ENS info when account or provider changes
-  useEffect(() => {
-    fetchEnsInfo();
-  }, [fetchEnsInfo]);
-
-  // Auto-scroll
+  // auto scroll
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -167,17 +161,12 @@ function App() {
                   }`}
                 >
                   <div className="message-header">
-                    {ensAvatar && msg.user?.toLowerCase() === currentAccount.toLowerCase() ? (
-                      <img
-                        src={ensAvatar}
-                        alt="ENS avatar"
-                        className="ens-avatar"
-                      />
-                    ) : (
-                      <>
-                        {msg.user?.slice(0, 6)}...{msg.user?.slice(-4)}
-                      </>
-                    )}
+                    <img
+                      src={msg.avatar || "https://i.pravatar.cc/40"}
+                      alt="avatar"
+                      className="avatar"
+                    />
+                    {msg.user?.slice(0, 6)}...{msg.user?.slice(-4)}
                   </div>
 
                   <div>{msg.text}</div>
@@ -186,6 +175,8 @@ function App() {
                 </div>
               );
             })}
+
+            {isTyping && <p className="typing-indicator">Someone is typing...</p>}
 
             <div ref={messagesEndRef} />
           </div>
