@@ -2,12 +2,9 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { HelloRobinhoodAddress, HelloRobinhoodABI } from "./constants.js";
 import { ethers } from "ethers";
 import "./index.css";
-
-// ✅ Correct import with extension
 import { useWeb3 } from "./context/Web3Context.jsx";
 
 function App() {
-  // ✅ get provider + wallet from context
   const { provider, signer, account, connectWallet } = useWeb3();
 
   const [walletConnected, setWalletConnected] = useState(false);
@@ -15,16 +12,14 @@ function App() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isTyping, setIsTyping] = useState(false); // typing indicator for others
+  const [isTyping] = useState(false); // removed unused setter
 
   const messagesEndRef = useRef(null);
 
-  /* ---------------- SCROLL ---------------- */
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  /* ---------------- SYNC CONTEXT WALLET ---------------- */
   useEffect(() => {
     if (account) {
       setCurrentAccount(account);
@@ -35,7 +30,6 @@ function App() {
     }
   }, [account]);
 
-  /* ---------------- GET CONTRACT ---------------- */
   const getContract = useCallback(
     async (withSigner = false) => {
       if (!provider) return null;
@@ -54,10 +48,7 @@ function App() {
     [provider, signer]
   );
 
-  /* ---------------- FETCH ENS INFO (mock + real) ---------------- */
   const fetchEnsInfo = useCallback(async () => {
-    // This is just a placeholder for potential ENS integration
-    // For now, we can use mock avatars for testing
     const mockMessages = [
       {
         user: "0xAbC123...7890",
@@ -82,20 +73,17 @@ function App() {
     setMessages(mockMessages);
   }, []);
 
-  /* ---------------- LOAD MESSAGES ---------------- */
   const getMessages = useCallback(async () => {
     try {
       const contract = await getContract(false);
       if (!contract) return;
 
-      // Mock call: use fetchEnsInfo for now
       await fetchEnsInfo();
     } catch (err) {
       console.error("Fetch messages failed:", err);
     }
   }, [getContract, fetchEnsInfo]);
 
-  /* ---------------- SEND MESSAGE ---------------- */
   const sendMessage = async () => {
     if (!newMessage.trim()) return;
 
@@ -117,7 +105,6 @@ function App() {
     }
   };
 
-  /* ---------------- FORMAT TIME ---------------- */
   const formatTime = (timestamp) => {
     if (!timestamp) return "";
     const date = new Date(Number(timestamp) * 1000);
@@ -125,18 +112,14 @@ function App() {
     return date.toLocaleString();
   };
 
-  /* ---------------- EFFECTS ---------------- */
-  // load messages when connected
   useEffect(() => {
     if (walletConnected && provider) getMessages();
   }, [walletConnected, provider, getMessages]);
 
-  // auto scroll
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  /* ---------------- UI ---------------- */
   return (
     <div className="chat-container">
       <h2>HoodHub</h2>
