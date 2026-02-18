@@ -12,14 +12,15 @@ function App() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isTyping] = useState(false); // removed unused setter
 
   const messagesEndRef = useRef(null);
 
+  /* ---------------- SCROLL ---------------- */
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  /* ---------------- WALLET STATE ---------------- */
   useEffect(() => {
     if (account) {
       setCurrentAccount(account);
@@ -30,6 +31,7 @@ function App() {
     }
   }, [account]);
 
+  /* ---------------- CONTRACT ---------------- */
   const getContract = useCallback(
     async (withSigner = false) => {
       if (!provider) return null;
@@ -43,47 +45,38 @@ function App() {
         );
       }
 
-      return new ethers.Contract(HelloRobinhoodAddress, HelloRobinhoodABI, provider);
+      return new ethers.Contract(
+        HelloRobinhoodAddress,
+        HelloRobinhoodABI,
+        provider
+      );
     },
     [provider, signer]
   );
 
-  const fetchEnsInfo = useCallback(async () => {
-    const mockMessages = [
-      {
-        user: "0xAbC123...7890",
-        text: "Welcome to HoodHub!",
-        timestamp: Math.floor(Date.now() / 1000) - 60,
-        avatar: "https://i.pravatar.cc/40?img=1",
-      },
-      {
-        user: "0xDeF456...1234",
-        text: "Hey there, excited to chat!",
-        timestamp: Math.floor(Date.now() / 1000) - 30,
-        avatar: "https://i.pravatar.cc/40?img=2",
-      },
-      {
-        user: "0xGhI789...5678",
-        text: "Mock avatar testing works!",
-        timestamp: Math.floor(Date.now() / 1000),
-        avatar: "https://i.pravatar.cc/40?img=3",
-      },
-    ];
-
-    setMessages(mockMessages);
-  }, []);
-
+  /* ---------------- FETCH MESSAGES ---------------- */
   const getMessages = useCallback(async () => {
     try {
       const contract = await getContract(false);
       if (!contract) return;
 
-      await fetchEnsInfo();
+      // IMPORTANT: make sure contract has getMessages()
+      const fetchedMessages = await contract.getMessages();
+
+      const formatted = fetchedMessages.map((msg) => ({
+        user: msg.user,
+        text: msg.text,
+        timestamp: Number(msg.timestamp),
+        avatar: "https://i.pravatar.cc/40",
+      }));
+
+      setMessages(formatted);
     } catch (err) {
       console.error("Fetch messages failed:", err);
     }
-  }, [getContract, fetchEnsInfo]);
+  }, [getContract]);
 
+  /* ---------------- SEND MESSAGE ---------------- */
   const sendMessage = async () => {
     if (!newMessage.trim()) return;
 
@@ -105,6 +98,7 @@ function App() {
     }
   };
 
+  /* ---------------- FORMAT TIME ---------------- */
   const formatTime = (timestamp) => {
     if (!timestamp) return "";
     const date = new Date(Number(timestamp) * 1000);
@@ -112,14 +106,19 @@ function App() {
     return date.toLocaleString();
   };
 
+  /* ---------------- LOAD MESSAGES ---------------- */
   useEffect(() => {
-    if (walletConnected && provider) getMessages();
+    if (walletConnected && provider) {
+      getMessages();
+    }
   }, [walletConnected, provider, getMessages]);
 
+  /* ---------------- AUTO SCROLL ---------------- */
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
+  /* ---------------- UI ---------------- */
   return (
     <div className="chat-container">
       <h2>HoodHub</h2>
@@ -134,7 +133,8 @@ function App() {
             {messages.map((msg, idx) => {
               const isUser =
                 currentAccount &&
-                msg.user?.toLowerCase() === currentAccount.toLowerCase();
+                msg.user?.toLowerCase() ===
+                  currentAccount.toLowerCase();
 
               return (
                 <div
@@ -149,17 +149,18 @@ function App() {
                       alt="avatar"
                       className="avatar"
                     />
-                    {msg.user?.slice(0, 6)}...{msg.user?.slice(-4)}
+                    {msg.user?.slice(0, 6)}...
+                    {msg.user?.slice(-4)}
                   </div>
 
                   <div>{msg.text}</div>
 
-                  <div className="timestamp">{formatTime(msg.timestamp)}</div>
+                  <div className="timestamp">
+                    {formatTime(msg.timestamp)}
+                  </div>
                 </div>
               );
             })}
-
-            {isTyping && <p className="typing-indicator">Someone is typing...</p>}
 
             <div ref={messagesEndRef} />
           </div>
