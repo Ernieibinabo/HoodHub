@@ -7,6 +7,23 @@ import { useWeb3 } from "./context/Web3Context.jsx";
 function App() {
   const { provider, signer, account, connectWallet } = useWeb3();
 
+  /* ---------------- THEME STATE (NEW) ---------------- */
+  const [theme, setTheme] = useState(
+    localStorage.getItem("theme") || "dark"
+  );
+
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+  };
+
+  // Apply theme to body
+  useEffect(() => {
+    document.body.className = theme;
+  }, [theme]);
+
+  /* ---------------- CHAT STATE ---------------- */
   const [walletConnected, setWalletConnected] = useState(false);
   const [currentAccount, setCurrentAccount] = useState("");
   const [messages, setMessages] = useState([]);
@@ -60,7 +77,6 @@ function App() {
       const contract = await getContract(false);
       if (!contract) return;
 
-      // IMPORTANT: make sure contract has getMessages()
       const fetchedMessages = await contract.getMessages();
 
       const formatted = fetchedMessages.map((msg) => ({
@@ -121,7 +137,15 @@ function App() {
   /* ---------------- UI ---------------- */
   return (
     <div className="chat-container">
-      <h2>HoodHub</h2>
+      {/* HEADER */}
+      <div className="header">
+        <h2>HoodHub</h2>
+
+        {/* 🌙 THEME BUTTON (NEW) */}
+        <button className="theme-toggle" onClick={toggleTheme}>
+          {theme === "dark" ? "☀ Light Mode" : "🌙 Dark Mode"}
+        </button>
+      </div>
 
       {!walletConnected ? (
         <button onClick={connectWallet}>Connect Wallet</button>

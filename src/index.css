@@ -1,29 +1,73 @@
+/* ---------------- THEME VARIABLES ---------------- */
+body.light {
+  --bg: #f5f5f7;
+  --card: #ffffff;
+  --text: #333333;
+  --bubble-other: #e5e5ea;
+  --bubble-me: #4a90e2;
+  --border: #dddddd;
+  --input-bg: #ffffff;
+}
+
+body.dark {
+  --bg: #0f1115;
+  --card: #1a1d24;
+  --text: #f1f1f1;
+  --bubble-other: #2a2f3a;
+  --bubble-me: #4a90e2;
+  --border: #2f3440;
+  --input-bg: #222631;
+}
+
 /* ---------------- GENERAL ---------------- */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f5f5f7;
+  background-color: var(--bg);
+  color: var(--text);
   margin: 0;
   padding: 0;
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
 .chat-container {
   max-width: 600px;
   margin: 40px auto;
-  background: #ffffff;
+  background: var(--card);
   border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   padding: 16px;
   display: flex;
   flex-direction: column;
   height: 80vh;
+  transition: background 0.25s ease;
 }
 
 /* ---------------- HEADER ---------------- */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
 .chat-container h2 {
-  text-align: center;
-  margin: 0 0 16px 0;
+  margin: 0;
   font-size: 1.5rem;
-  color: #333333;
+}
+
+/* THEME BUTTON */
+.theme-toggle {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.theme-toggle:hover {
+  opacity: 0.8;
 }
 
 /* ---------------- MESSAGES AREA ---------------- */
@@ -41,7 +85,6 @@ body {
   max-width: 75%;
   padding: 8px 12px;
   border-radius: 12px;
-  position: relative;
   word-break: break-word;
   display: flex;
   flex-direction: column;
@@ -49,15 +92,15 @@ body {
 }
 
 .my-message {
-  background-color: #4a90e2;
+  background-color: var(--bubble-me);
   color: white;
   align-self: flex-end;
   border-bottom-right-radius: 2px;
 }
 
 .other-message {
-  background-color: #e5e5ea;
-  color: #000;
+  background-color: var(--bubble-other);
+  color: var(--text);
   align-self: flex-start;
   border-bottom-left-radius: 2px;
 }
@@ -76,13 +119,13 @@ body {
   height: 24px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
 }
 
 /* ---------------- TIMESTAMP ---------------- */
 .timestamp {
   font-size: 0.7rem;
-  color: #888;
+  opacity: 0.7;
   align-self: flex-end;
   margin-top: 2px;
 }
@@ -93,21 +136,23 @@ body {
   align-items: center;
   gap: 8px;
   padding: 8px 0;
-  border-top: 1px solid #ddd;
+  border-top: 1px solid var(--border);
 }
 
 .input-area input {
   flex: 1;
   padding: 10px 12px;
   border-radius: 12px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   font-size: 1rem;
   outline: none;
+  background: var(--input-bg);
+  color: var(--text);
 }
 
 .input-area input:focus {
   border-color: #4a90e2;
-  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.25);
 }
 
 .input-area button {
@@ -118,7 +163,7 @@ body {
   border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: 0.2s;
 }
 
 .input-area button:disabled {
@@ -136,7 +181,7 @@ body {
 }
 
 .messages::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(120, 120, 120, 0.4);
   border-radius: 4px;
 }
 
@@ -144,7 +189,7 @@ body {
   background: transparent;
 }
 
-/* ---------------- PLACEHOLDER TEXT ---------------- */
+/* ---------------- PLACEHOLDER ---------------- */
 input::placeholder {
-  color: #aaa;
+  color: #888;
 }
