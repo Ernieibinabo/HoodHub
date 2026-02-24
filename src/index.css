@@ -455,3 +455,125 @@ input::placeholder {
   color: #ea3943; /* Binance red */
   font-weight: 600;
 }
+/* ================= TRADE PAGE ================= */
+
+.trade-page {
+  height: 100vh;
+  background: #0b0e11;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+.trade-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 15px 20px;
+  border-bottom: 1px solid #1e2329;
+  background: #0b0e11;
+}
+
+.back-btn {
+  background: #1e2329;
+  border: none;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.back-btn:hover {
+  background: #2b3139;
+}
+
+.pair-info h2 {
+  margin: 0;
+}
+
+.pair-sub {
+  font-size: 12px;
+  color: #848e9c;
+}
+
+/* MAIN LAYOUT */
+.trade-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 10px;
+  padding: 10px;
+}
+
+/* CHART */
+.chart-area {
+  background: #0b0e11;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* TRADE PANEL */
+.trade-panel {
+  background: #11151a;
+  border-radius: 10px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.trade-tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.trade-tabs button {
+  flex: 1;
+  padding: 10px;
+  background: #1e2329;
+  border: none;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.trade-tabs .active {
+  background: #16c784;
+}
+
+.trade-input {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.trade-input input {
+  background: #0b0e11;
+  border: 1px solid #2b3139;
+  padding: 10px;
+  border-radius: 6px;
+  color: white;
+}
+
+/* BUTTONS */
+.buy-btn {
+  background: #16c784;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.sell-btn {
+  background: #ea3943;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
